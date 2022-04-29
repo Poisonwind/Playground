@@ -8,16 +8,16 @@ import (
 )
 
 func main() {	
-	myLog := log.New(os.Stdout, "webSarvar", log.LstdFlags)
+	myLog := log.New(os.Stdout, "webSarvar ", log.LstdFlags)
 	
 	myServeMux := http.NewServeMux()
-	helloHandler := handlers.NewGreet(myLog)
+	helloHandler := handlers.NewHello(myLog)
+	goodByeHandler := handlers.NewGoodbye(myLog)
 
 	myServeMux.Handle("/", helloHandler)
+	myServeMux.Handle("/gb/", goodByeHandler)
 
-	log.Println("Server started")
-	http.ListenAndServe(":9090", myServeMux)
-	
-	
+	myLog.Println("Server started")
+	http.ListenAndServe(":9090", myServeMux)	
 
 }

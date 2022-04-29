@@ -7,16 +7,16 @@ import (
 	"net/http"
 )
 
-type Greet struct {
+type Hello struct {
 	log *log.Logger
 }
 
-func NewGreet(l *log.Logger) *Greet {
-	return &Greet{l}
+func NewHello(l *log.Logger) *Hello {
+	return &Hello{l}
 }
 
-func (greet *Greet) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	greet.log.Println("Nothing here")
+func (hello *Hello) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+
 	data, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
@@ -24,12 +24,14 @@ func (greet *Greet) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Data: %s", data)
+	
 	
 	if string(data)== "" {
 		fmt.Fprintln(rw, "Hello! You said nothing!")
+		hello.log.Println("There is no data")
 	} else {
 		fmt.Fprintf(rw, "Hello! You said: %s", data)
+		hello.log.Printf("Data: %s", data)
 	}
 	
 
