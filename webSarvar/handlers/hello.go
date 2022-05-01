@@ -24,8 +24,6 @@ func (hello *Hello) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	
-	
 	if string(data)== "" {
 		fmt.Fprintln(rw, "Hello! You said nothing!")
 		hello.log.Println("There is no data")
