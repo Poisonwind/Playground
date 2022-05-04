@@ -12,16 +12,11 @@ import (
 )
 
 func main() {	
-	myLog := log.New(os.Stdout, "webSarvar ", log.LstdFlags)
-	
-	myServeMux := http.NewServeMux()
-	helloHandler := handlers.NewHello(myLog)
-	goodByeHandler := handlers.NewGoodbye(myLog)
-	productHandler := handlers.NewProduct(myLog)
 
-	myServeMux.Handle("/", helloHandler)
-	myServeMux.Handle("/gb/", goodByeHandler)
-	myServeMux.Handle("/product/", productHandler)
+	//INIT//
+
+	myLog := log.New(os.Stdout, "webSarvar ", log.LstdFlags)	
+	myServeMux := http.NewServeMux()
 
 	myServer := &http.Server{
 		Addr: ":9090",
@@ -30,6 +25,19 @@ func main() {
 		ReadTimeout: 1*time.Second,
 		WriteTimeout: 1*time.Second,
 	}
+
+	//HANDLERS//
+
+	helloHandler := handlers.NewHello(myLog)
+	goodByeHandler := handlers.NewGoodbye(myLog)
+	productHandler := handlers.NewProduct(myLog)
+
+	myServeMux.Handle("/", helloHandler)
+	myServeMux.Handle("/gb/", goodByeHandler)
+	myServeMux.Handle("/product/", productHandler)
+
+	
+	// START //
 
 	go func() {
 		err := myServer.ListenAndServe()
@@ -40,6 +48,8 @@ func main() {
 
 	myLog.Println("Server started")
 	
+	// SHUTDOWN //
+
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
