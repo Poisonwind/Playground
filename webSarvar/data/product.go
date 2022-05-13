@@ -37,6 +37,17 @@ func GetProducts() Products {
 	return ProductList
 }
 
+func GetNextID() (newId int) {
+	lastProduct := ProductList[len(ProductList)-1]
+	newId = lastProduct.ID + 1
+	return
+}
+
+func AddProduct (p *Product){
+	p.ID = GetNextID()
+	ProductList = append(ProductList, p)
+}
+
 var ProductList = []*Product{
 	&Product{
 		ID:          1,

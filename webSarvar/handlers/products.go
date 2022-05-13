@@ -3,6 +3,8 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"regexp"
+	"strconv"
 	"websarvar/data"
 )
 
@@ -24,6 +26,26 @@ func (p *Product) ServeHTTP(rw http.ResponseWriter, r *http.Request){
 	if r.Method == http.MethodPost {
 		p.addProducts(rw, r)
 		return
+	}
+
+	if r.Method == http.MethodPut {
+		exp := regexp.MustCompile(`/(\d+)`)
+		subStrings := exp.FindAllStringSubmatch(r.URL.Path, -1)
+
+		if len(subStrings) != 1 {
+			http.Error(rw, "Invalid URI", http.StatusBadRequest)
+		}
+
+		if len(subStrings[0]) != 1 {
+			http.Error(rw, "Invalid URI", http.StatusBadRequest)
+		}
+
+		idString := subStrings[0][1]
+		id, err := strconv.Atoi(idString)
+		if err != nil {
+			p.log.Println(err)
+		}
+		p.log.Println("got id", id)
 	}
 
 	rw.WriteHeader(http.StatusMethodNotAllowed)
@@ -54,4 +76,5 @@ func (p *Product) addProducts(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	p.log.Printf("new prod: %#v", prod)
+	data.AddProduct(prod)
 }
