@@ -9,18 +9,25 @@ import (
 	"syscall"
 	"time"
 	"websarvar/handlers"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {	
 
 	//INIT//
 
-	myLog := log.New(os.Stdout, "webSarvar ", log.LstdFlags)	
-	myServeMux := http.NewServeMux()
+	myLog := log.New(os.Stdout, "webSarvar ", log.LstdFlags)
+
+	myRouter := mux.NewRouter()
+
+	getRouter := myRouter.Methods(http.MethodGet).Subrouter()
+	putRouter := myRouter.Methods(http.MethodPut).Subrouter()
+	postRouter := myRouter.Methods(http.MethodPost).Subrouter()
 
 	myServer := &http.Server{
 		Addr: ":9090",
-		Handler: myServeMux,
+		Handler: myRouter,
 		IdleTimeout: 120*time.Second,
 		ReadTimeout: 1*time.Second,
 		WriteTimeout: 1*time.Second,
@@ -29,14 +36,22 @@ func main() {
 	//HANDLERS//
 
 	helloHandler := handlers.NewHello(myLog)
-	goodByeHandler := handlers.NewGoodbye(myLog)
 	productHandler := handlers.NewProduct(myLog)
+	goodByeHandler := handlers.NewGoodbye(myLog)
 
-	myServeMux.Handle("/", helloHandler)
-	myServeMux.Handle("/gb/", goodByeHandler)
-	myServeMux.Handle("/product/", productHandler)
+	//ROUTERS//
 
-	
+	//GET//
+	getRouter.HandleFunc("/", helloHandler.GetJustHello)
+	getRouter.HandleFunc("/gb/", goodByeHandler.GetJustGoodbye)
+	getRouter.HandleFunc("/products/", productHandler.GetProducts)
+
+	//POST//
+	postRouter.HandleFunc("/products/", productHandler.AddProducts)
+
+	//PUT//
+	putRouter.HandleFunc("/products/{id:[0-9]+}", productHandler.UpdateProducts)
+
 	// START //
 
 	go func() {
