@@ -47,10 +47,14 @@ func main() {
 	getRouter.HandleFunc("/products/", productHandler.GetProducts)
 
 	//POST//
+	postRouter.Use(productHandler.MiddlewareProductValidation)
 	postRouter.HandleFunc("/products/", productHandler.AddProducts)
+	
 
 	//PUT//
+	putRouter.Use(productHandler.MiddlewareProductValidation)
 	putRouter.HandleFunc("/products/{id:[0-9]+}", productHandler.UpdateProducts)
+	
 
 	// START //
 
