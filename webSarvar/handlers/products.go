@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -72,17 +73,32 @@ type ProductKey struct{}
 
 func (p *Product) MiddlewareProductValidation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request){
+		//parsing json
 		prod := &data.Product{}
 		err := prod.FromJSON(r.Body)
 	
 		if err != nil {
-			http.Error(rw, "unable to unmarshal json", http.StatusBadRequest)
+			p.log.Println("[ERROR] deserializing product", err)
+			http.Error(rw, "error reading product", http.StatusBadRequest)
 			return
 		}
 
+		//validate &Product
+		err = prod.Validate()
+		if err != nil {
+			p.log.Println("[ERROR] validating product", err)
+			http.Error(
+				rw,
+				fmt.Sprintf("error validating product: %s", err),
+				http.StatusBadRequest)
+			return			
+		}
+
+		//add product to context for passing through
 		ctx := context.WithValue(r.Context(), ProductKey{}, prod)
 		req := r.WithContext(ctx)
-
+		
+		//call next handler
 		next.ServeHTTP(rw, req)
 	})
 

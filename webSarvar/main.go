@@ -31,7 +31,7 @@ func main() {
 		IdleTimeout: 120*time.Second,
 		ReadTimeout: 1*time.Second,
 		WriteTimeout: 1*time.Second,
-	}
+	} 
 
 	//HANDLERS//
 
@@ -76,8 +76,7 @@ func main() {
 	myLog.Println("Graceful shutdown", sig)
 
 	myContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	myServer.Shutdown(myContext)
-
 	defer cancel()
 
+	myServer.Shutdown(myContext)
 }
